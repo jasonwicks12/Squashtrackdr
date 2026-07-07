@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1D2126">
+<title>Squash Log</title>
+<style>
+  :root{--paper:#F4F4F2;--card:#FFFFFF;--ink:#17181A;--muted:#6C7075;--line:#E4E4E0;--red:#C8102E;--red-press:#A20D24;--slate:#1D2126;--slate-soft:#2B3037;--good:#1E7F4F;--field:#FAFAF8;--shadow:0 1px 2px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.04)}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--paper);color:var(--ink);line-height:1.45;font-size:15px;-webkit-font-smoothing:antialiased;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .wrap{max-width:520px;margin:0 auto}
+  header{background:var(--slate);color:#fff;padding:calc(env(safe-area-inset-top) + 16px) 20px 16px;position:sticky;top:0;z-index:20}
+  .brand{display:flex;align-items:center;gap:10px}
+  .mark{width:22px;height:22px;flex:none}
+  .mark line{stroke:var(--red);stroke-width:2.4;stroke-linecap:round}
+  .brand h1{font-size:16px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin:0}
+  .tagline{color:#AEB4BA;font-size:12px;margin:2px 0 0 32px}
+  .stats{display:flex;margin-top:14px;background:var(--slate-soft);border-radius:12px;overflow:hidden}
+  .stat{flex:1;padding:10px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+  .stat:last-child{border-right:0}
+  .stat b{display:block;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+  .stat span{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#9AA0A6;margin-top:3px}
+  main{padding:18px 16px 24px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h2.screen{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+  .choice{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+  .bigbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;font-size:16px;font-weight:700;color:var(--ink);box-shadow:var(--shadow);cursor:pointer}
+  .bigbtn .ic{width:40px;height:40px;border-radius:11px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none}
+  .bigbtn small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;margin-top:2px}
+  .bigbtn:active{transform:scale(.99)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+  .card > .grp:last-child{margin-bottom:0}
+  .grp{margin-bottom:16px}
+  label.lbl{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  input[type=text],input[type=number],input[type=date],select,textarea{width:100%;font-family:inherit;font-size:16px;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:11px;padding:12px;appearance:none}
+  textarea{resize:vertical;min-height:44px;line-height:1.4}
+  select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236C7075' stroke-width='1.6'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:34px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--red);outline-offset:1px;border-color:transparent}
+  .two{display:flex;gap:12px}.two > div{flex:1;min-width:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:600;cursor:pointer;user-select:none}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .bestof{display:flex;gap:8px;margin-bottom:14px}
+  .bestof button{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--field);font-weight:700;font-size:13px;letter-spacing:.03em;color:var(--muted);cursor:pointer}
+  .bestof button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .game-line{display:flex;align-items:center;justify-content:center;gap:10px;margin:9px 0}
+  .game-line .gnum{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);width:54px;text-align:right;flex:none}
+  .game-line .gdash{color:var(--muted);font-size:22px;font-weight:300}
+  .scell{width:54px;height:52px;flex:none;border-radius:12px;border:2px solid var(--line);background:#fff;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink);cursor:pointer;padding:0}
+  .scell.active{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.13)}
+  .keypad{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:16px}
+  .keypad button{padding:13px 0;border-radius:10px;border:1px solid var(--line);background:var(--field);font-size:17px;font-weight:700;color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums}
+  .keypad button:active{background:#eaeaea}
+  .keypad .clear{grid-column:span 6;background:#fff;color:var(--red);font-weight:800;font-size:14px}
+  .resultpill{margin:16px auto 0;text-align:center;font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .resultpill.win{color:var(--good)}.resultpill.loss{color:var(--red)}
+  .rating{padding:4px 0}
+  .rlabel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;margin:12px 0 9px}
+  .rrow{display:flex;justify-content:space-between;align-items:center;gap:3px;position:relative}
+  .rrow::before{content:"";position:absolute;left:4%;right:4%;top:50%;height:1px;background:var(--line);z-index:0}
+  .rcirc{position:relative;z-index:1;flex:1 1 0;min-width:0;max-width:36px;aspect-ratio:1;height:auto;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums;padding:0;display:flex;align-items:center;justify-content:center}
+  .rcirc.on{background:var(--good);border-color:var(--good);color:#fff;transform:scale(1.14);font-size:14px}
+  .focusremind{font-size:12.5px;color:var(--red);background:#FCF3F4;border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:9px 12px;margin:0 0 10px;font-weight:600;line-height:1.4}
+  .reflect-ta{min-height:96px}
+  .micbtn{display:inline-flex;align-items:center;gap:9px;margin-top:11px;border:1px solid var(--line);background:var(--field);border-radius:999px;padding:11px 18px;font-weight:700;font-size:14px;color:var(--red);cursor:pointer}
+  .micbtn.listening{background:var(--red);color:#fff;border-color:var(--red);animation:pulse 1.3s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,16,46,.4)}70%{box-shadow:0 0 0 12px rgba(200,16,46,0)}100%{box-shadow:0 0 0 0 rgba(200,16,46,0)}}
+  .btnrow{display:flex;gap:10px;margin-top:6px}
+  .btn{flex:1;border:none;border-radius:13px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--red);color:#fff}.btn.primary:active{background:var(--red-press)}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .btn.block{width:100%}
+  .btn.dark{background:var(--slate);color:#fff}
+  .entry{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:10px;box-shadow:var(--shadow)}
+  .entry-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .badge{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+  .badge.match{background:#FCE7EB;color:var(--red)}.badge.coaching{background:#E7EFF9;color:#1F5FA8}.badge.solo{background:#E9F3EC;color:var(--good)}
+  .entry h3{font-size:16px;font-weight:700;margin:8px 0 2px}
+  .entry .meta{font-size:12.5px;color:var(--muted)}
+  .entry .tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+  .minichip{font-size:11px;font-weight:600;color:var(--muted);background:var(--field);border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+  .entry .date{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .expand{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13.5px;color:#333;display:none}
+  .expand.open{display:block}
+  .expand .kv{margin:3px 0}.expand .kv b{color:var(--ink)}
+  .del{background:none;border:none;color:var(--red);font-size:12px;font-weight:700;cursor:pointer;padding:6px 0;margin-top:6px}
+  .listitem{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .listitem .txt{flex:1;min-width:0}
+  .listitem .txt b{font-size:15px}
+  .listitem .txt small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+  .iconbtn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1}
+  .iconbtn.danger{color:var(--red)}
+  .tog{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;flex:none;transition:background .15s}
+  .tog.on{background:var(--good)}
+  .tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+  .tog.on::after{left:21px}
+  .addrow{display:flex;gap:8px;margin-top:4px}
+  .addrow input{flex:1;min-width:0}
+  .addrow button{border:none;background:var(--ink);color:#fff;border-radius:11px;padding:0 18px;font-weight:700;font-size:15px;cursor:pointer;flex:none}
+  .setup-note{font-size:12.5px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;margin-bottom:16px;line-height:1.5}
+  .empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:14px}
+  .empty .big{font-size:34px;margin-bottom:8px}
+  nav{position:fixed;bottom:0;left:0;right:0;background:var(--slate);padding:8px 0 calc(env(safe-area-inset-bottom) + 8px);z-index:30;display:flex;border-top:1px solid rgba(255,255,255,.06)}
+  .tab{flex:1;background:none;border:none;color:#8B9198;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .tab svg{width:22px;height:22px;stroke:#8B9198;fill:none;stroke-width:1.9}
+  .tab.on{color:#fff}.tab.on svg{stroke:var(--red)}
+  .toast{position:fixed;bottom:calc(84px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;transition:all .25s;z-index:50;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .banner{background:#FFF4E5;border:1px solid #F4D9A8;color:#7A5B12;font-size:12.5px;padding:10px 14px;border-radius:11px;margin:0 16px;line-height:1.4}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><svg class="mark" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="12" y1="6" x2="12" y2="20"/></svg><h1>Squash Log</h1></div>
+    <div class="tagline">Play &middot; reflect &middot; work on it</div>
+    <div class="stats" id="stats"></div>
+  </header>
+  <div id="banner"></div>
+  <main id="view"></main>
+</div>
+<nav id="nav">
+  <button class="tab" data-tab="log"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Log</button>
+  <button class="tab" data-tab="history"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>History</button>
+  <button class="tab" data-tab="focus"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Focus</button>
+  <button class="tab" data-tab="setup"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>Setup</button>
+</nav>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+const KEY="squashlog_v1";
+const clone=(typeof structuredClone==="function")?structuredClone:(o=>JSON.parse(JSON.stringify(o)));
+const DEFAULTS = {
+  settings:{
+    ratingDimensions:["Overall performance","Length","Ability to control the T","Short game","Movement / speed","Fitness"],
+    shotTypes:["Straight drive","Cross-court drive","Straight drop","Cross drop","Boast","Volley","Volley drop","Lob","Kill / nick","Serve"],
+    opponentStyles:["Power hitter","Retriever / attritional","Drop-shot player","All-court","Attacking shot-maker","Volleyer","Lobber","Lefty"],
+    matchTypes:["League","Box","Friendly","Tournament","Practice match"]
+  },
+  focuses:[
+    {id:"f_ros", name:"Return of serve", active:true},
+    {id:"f_drv", name:"Straight drives",  active:true},
+    {id:"f_beh", name:"Not getting stuck behind opponent", active:true}
+  ],
+  opponents:[], matches:[], coaching:[], solo:[]
+};
+let state, tab="log", storageOK=true;
+let mgames=[], activeCell={g:0,side:"you"}, bestOf=5, mrate={};
+let recog=null, recognizing=false;
+
+function load(){
+  try{ const raw=localStorage.getItem(KEY); state = raw ? JSON.parse(raw) : clone(DEFAULTS); }
+  catch(e){ state=clone(DEFAULTS); storageOK=false; }
+  for(const k in DEFAULTS){ if(state[k]===undefined) state[k]=clone(DEFAULTS[k]); }
+  for(const k in DEFAULTS.settings){ if(!state.settings[k]) state.settings[k]=clone(DEFAULTS.settings[k]); }
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){ storageOK=false; renderBanner(); } }
+const uid = p => (p||"id")+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const todayISO = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+const esc = s => (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtDate = iso => { if(!iso) return ""; const d=new Date(iso+"T00:00"); return d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"2-digit"}); };
+const activeFocuses = () => state.focuses.filter(f=>f.active);
+const num = v => v===""||v==null?null:+v;
+const $ = s => document.querySelector(s);
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2000); }
+function renderBanner(){ $("#banner").innerHTML = storageOK ? "" : `<div class="banner">Heads up: this browser is blocking local storage, so entries won't be kept between visits. Save this file to your phone and open it there. <b>Export still works.</b></div>`; }
+function renderStats(){
+  const m=state.matches, w=m.filter(x=>x.result==="Win").length, l=m.filter(x=>x.result==="Loss").length;
+  const sessions=state.coaching.length+state.solo.length;
+  $("#stats").innerHTML = `<div class="stat"><b>${m.length}</b><span>Matches</span></div><div class="stat"><b>${w}\u2013${l}</b><span>Win\u2013Loss</span></div><div class="stat"><b>${sessions}</b><span>Sessions</span></div><div class="stat"><b>${activeFocuses().length}</b><span>Focuses</span></div>`;
+}
+function render(){
+  renderBanner(); renderStats();
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
+  const v=$("#view");
+  if(tab==="log") v.innerHTML=viewLogHome();
+  else if(tab==="history") v.innerHTML=viewHistory();
+  else if(tab==="focus") v.innerHTML=viewFocus();
+  else if(tab==="setup") v.innerHTML=viewSetup();
+  window.scrollTo(0,0);
+}
+function viewLogHome(){
+  return `<p class="eyebrow">New entry</p><h2 class="screen">What happened?</h2><p class="sub">Twenty seconds. Tap through, save, done.</p>
+  <div class="choice">
+    <button class="bigbtn" data-action="new-match"><span class="ic">V</span><span>Log a match<small>Points, opponent, how it went + your focuses</small></span></button>
+    <button class="bigbtn" data-action="new-coaching"><span class="ic" style="background:#1F5FA8">C</span><span>Coaching session<small>What you worked on</small></span></button>
+    <button class="bigbtn" data-action="new-solo"><span class="ic" style="background:var(--good)">S</span><span>Solo session<small>Drills, ghosting, hitting</small></span></button>
+  </div>`;
+}
+function chipHtml(list, name){ return list.map(o=>`<button type="button" class="chip" data-chip data-group="${esc(name)}" data-val="${esc(o)}">${esc(o)}</button>`).join(""); }
+function shotOptions(){ return `<option value="">\u2014</option>`+state.settings.shotTypes.map(s=>`<option>${esc(s)}</option>`).join(""); }
+function ratingRow(label,key){
+  const sel=mrate[key];
+  let c=""; for(let n=1;n<=10;n++) c+=`<button type="button" class="rcirc${sel===n?" on":""}" data-rate="${esc(key)}" data-v="${n}">${n}</button>`;
+  return `<div class="rating"><div class="rlabel">${esc(label)}</div><div class="rrow" data-raterow="${esc(key)}">${c}</div></div>`;
+}
+function stopMic(){ if(recog&&recognizing){ try{recog.stop();}catch(e){} } }
+function setMicUI(on){ const b=$("#micBtn"),l=$("#micLabel"); if(!b)return; b.classList.toggle("listening",on); if(l) l.textContent=on?"Listening\u2026 tap to stop":"Tap to speak"; }
+function toggleMic(btn,targetId){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const ta=$("#"+targetId); if(!ta) return;
+  if(!SR){ ta.focus(); toast("In-app mic unavailable \u2014 tap the mic key on your keyboard"); return; }
+  if(recognizing){ if(recog){try{recog.stop();}catch(e){}} return; }
+  recog=new SR(); recog.lang=navigator.language||"en-GB"; recog.interimResults=true; recog.continuous=true;
+  const base=ta.value?ta.value.replace(/\s+$/,"")+" ":""; let finalText="";
+  recog.onresult=ev=>{ let interim=""; for(let i=ev.resultIndex;i<ev.results.length;i++){ const r=ev.results[i]; if(r.isFinal) finalText+=r[0].transcript+" "; else interim+=r[0].transcript; } ta.value=base+finalText+interim; };
+  recog.onend=()=>{ recognizing=false; setMicUI(false); };
+  recog.onerror=ev=>{ recognizing=false; setMicUI(false); if(ev.error==="not-allowed"||ev.error==="service-not-allowed") toast("Microphone blocked \u2014 use your keyboard mic instead"); };
+  try{ recog.start(); recognizing=true; setMicUI(true); }catch(e){}
+}
+function scell(i,side,val){ const act=activeCell.g===i&&activeCell.side===side; return `<button type="button" class="scell${act?" active":""}" data-cell data-g="${i}" data-side="${side}">${val==null?"":val}</button>`; }
+function renderGamesArea(){
+  const a=$("#gamesArea"); if(!a) return;
+  let gf=0,ga=0,pf=0,pa=0,any=false;
+  mgames.forEach(g=>{ const y=g.you,t=g.them; if(y!=null||t!=null)any=true; if(y!=null&&t!=null){ if(y>t)gf++; else if(t>y)ga++; pf+=y; pa+=t; } });
+  const lines=mgames.map((g,i)=>`<div class="game-line"><span class="gnum">Game ${i+1}</span>${scell(i,"you",g.you)}<span class="gdash">\u2013</span>${scell(i,"them",g.them)}</div>`).join("");
+  let summ="";
+  if(any){ const res=gf>ga?"Win":ga>gf?"Loss":"Level"; summ=`<div class="resultpill ${res==="Win"?"win":res==="Loss"?"loss":""}">${gf}\u2013${ga} &nbsp;\u00b7&nbsp; ${res} &nbsp;\u00b7&nbsp; ${pf}\u2013${pa} pts</div>`; }
+  a.innerHTML=`<div class="bestof"><button type="button" data-bestof="3" class="${bestOf===3?"on":""}">Best of 3</button><button type="button" data-bestof="5" class="${bestOf===5?"on":""}">Best of 5</button></div>${lines}${summ}`;
+}
+function advanceCell(){
+  const order=[]; for(let i=0;i<bestOf;i++){ order.push({g:i,side:"you"}); order.push({g:i,side:"them"}); }
+  const idx=order.findIndex(c=>c.g===activeCell.g&&c.side===activeCell.side);
+  if(idx>=0&&idx<order.length-1) activeCell=order[idx+1];
+}
+function setBestOf(n){ bestOf=n; while(mgames.length<n) mgames.push({you:null,them:null}); if(mgames.length>n) mgames=mgames.slice(0,n); if(activeCell.g>=n) activeCell={g:0,side:"you"}; renderGamesArea(); }
+function viewMatchForm(){
+  const s=state.settings;
+  const af=activeFocuses();
+  const reminder = af.length ? `<p class="focusremind">Working on: ${af.map(f=>esc(f.name)).join(" &middot; ")}</p>` : "";
+  const micIcon=`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2.5" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><line x1="12" y1="17.5" x2="12" y2="21"/></svg>`;
+  let keys=""; for(let n=0;n<=17;n++) keys+=`<button type="button" data-key="${n}">${n}</button>`;
+  keys+=`<button type="button" class="clear" data-key="clear">Clear</button>`;
+  return `<p class="eyebrow">Match</p><h2 class="screen">Log a match</h2>
+  <form id="mform" onsubmit="return false">
+  <div class="card">
+    <div class="grp"><label class="lbl">Date</label><input type="date" id="m_date" value="${todayISO()}"></div>
+    <div class="grp"><label class="lbl">Opponent</label><input type="text" id="m_opp" list="oppList" placeholder="Name" autocomplete="off"><datalist id="oppList">${state.opponents.map(o=>`<option value="${esc(o.name)}">`).join("")}</datalist></div>
+    <div class="two"><div class="grp"><label class="lbl">Type</label><select id="m_type">${s.matchTypes.map(t=>`<option>${esc(t)}</option>`).join("")}</select></div><div class="grp"><label class="lbl">Box / division</label><input type="text" id="m_box" placeholder="Optional"></div></div>
+    <div class="two"><div class="grp"><label class="lbl">My level</label><input type="number" inputmode="numeric" id="m_mylvl" placeholder="e.g. 1487"></div><div class="grp"><label class="lbl">Their level</label><input type="number" inputmode="numeric" id="m_opplvl" placeholder="e.g. 1600"></div></div>
+  </div>
+  <div class="card">
+    <label class="lbl">Score \u2014 points per game</label>
+    <div id="gamesArea"></div>
+    <div class="keypad">${keys}</div>
+    <p class="sub" style="text-align:center;margin:14px 0 0;font-size:12px">Tap a box, then a number. Auto-jumps to the next box.</p>
+  </div>
+  <div class="card"><div class="grp"><label class="lbl">Opponent's style</label><div class="chips">${chipHtml(s.opponentStyles,"oppstyle")}</div></div></div>
+  <div class="card"><label class="lbl">Rate your game (tap 1\u201310)</label>${s.ratingDimensions.map(d=>ratingRow(d,d)).join("")}</div>
+  <div class="card"><div class="two"><div class="grp" style="margin-bottom:0"><label class="lbl">Best shot</label><select id="m_best">${shotOptions()}</select></div><div class="grp" style="margin-bottom:0"><label class="lbl">Worst shot</label><select id="m_worst">${shotOptions()}</select></div></div></div>
+  <div class="card">
+    <label class="lbl">How did it go?</label>
+    ${reminder}
+    <textarea id="m_reflect" class="reflect-ta" placeholder="A sentence or two \u2014 how your focuses went, how it felt, anything worth remembering."></textarea>
+    <button type="button" class="micbtn" id="micBtn" data-action="mic" data-target="m_reflect">${micIcon}<span id="micLabel">Tap to speak</span></button>
+  </div>
+  <div class="btnrow"><button type="button" class="btn ghost" data-action="cancel" style="flex:0 0 auto;padding:15px 20px">Cancel</button><button type="button" class="btn primary" data-action="save-match">Save match</button></div>
+  </form>`;
+}
+function saveMatch(){
+  stopMic();
+  const opp=$("#m_opp").value.trim();
+  const games=mgames.map(g=>({you:g.you,them:g.them})).filter(g=>g.you!=null||g.them!=null);
+  let gf=0,ga=0,pf=0,pa=0;
+  games.forEach(g=>{ if(g.you!=null&&g.them!=null){ if(g.you>g.them)gf++; else if(g.them>g.you)ga++; } pf+=g.you||0; pa+=g.them||0; });
+  const styles=[...document.querySelectorAll('[data-group="oppstyle"].on')].map(c=>c.dataset.val);
+  const ratings={}; state.settings.ratingDimensions.forEach(d=>{ if(mrate[d]!=null) ratings[d]=mrate[d]; });
+  const focusesActive=activeFocuses().map(f=>f.name);
+  const reflection=$("#m_reflect")?$("#m_reflect").value.trim():"";
+  const rec={ id:uid("m"), kind:"match", date:$("#m_date").value||todayISO(), opponent:opp, box:$("#m_box").value.trim(), type:$("#m_type").value,
+    myLevel:num($("#m_mylvl").value), oppLevel:num($("#m_opplvl").value), oppStyles:styles, bestOf,
+    games, gamesFor:gf, gamesAgainst:ga, pointsFor:pf, pointsAgainst:pa, result: gf>ga?"Win":(ga>gf?"Loss":"Draw"),
+    ratings, bestShot:$("#m_best").value, worstShot:$("#m_worst").value, focusesActive, reflection };
+  state.matches.push(rec);
+  if(opp){ let o=state.opponents.find(x=>x.name.toLowerCase()===opp.toLowerCase()); if(!o){ o={name:opp}; state.opponents.push(o); } if(rec.oppLevel!=null) o.lastLevel=rec.oppLevel; if(styles.length) o.styles=styles; }
+  save(); tab="log"; render(); toast("Match saved");
+}
+function focusPickHtml(){ return state.focuses.map(f=>`<button type="button" class="chip" data-chip data-group="sesfocus" data-val="${esc(f.id)}">${esc(f.name)}</button>`).join(""); }
+function viewSessionForm(kind){
+  const title = kind==="coaching" ? "Coaching session" : "Solo session";
+  const coachField = kind==="coaching" ? `<div class="grp"><label class="lbl">Coach (optional)</label><input type="text" id="s_coach" placeholder="Name"></div>` : "";
+  const micIcon=`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2.5" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><line x1="12" y1="17.5" x2="12" y2="21"/></svg>`;
+  return `<p class="eyebrow">${kind==="coaching"?"Coaching":"Solo"}</p><h2 class="screen">${title}</h2>
+  <form id="sform" onsubmit="return false">
+  <div class="card">
+    <div class="two"><div class="grp"><label class="lbl">Date</label><input type="date" id="s_date" value="${todayISO()}"></div><div class="grp"><label class="lbl">Minutes</label><input type="number" inputmode="numeric" id="s_dur" placeholder="e.g. 45"></div></div>
+    ${coachField}
+    <div class="grp"><label class="lbl">Worked on your focuses</label>${state.focuses.length?`<div class="chips">${focusPickHtml()}</div>`:`<p class="sub" style="margin:0">No focuses yet \u2014 add some in the Focus tab.</p>`}</div>
+    <div class="grp" style="margin-bottom:0"><label class="lbl">What you worked on</label><textarea id="s_worked" class="reflect-ta" placeholder="Drills, corrections, patterns\u2026"></textarea>
+      <button type="button" class="micbtn" id="micBtn" data-action="mic" data-target="s_worked">${micIcon}<span id="micLabel">Tap to speak</span></button></div>
+  </div>
+  <div class="btnrow"><button type="button" class="btn ghost" data-action="cancel" style="flex:0 0 auto;padding:15px 20px">Cancel</button><button type="button" class="btn primary" data-action="save-session" data-kind="${kind}">Save session</button></div>
+  </form>`;
+}
+function saveSession(kind){
+  stopMic();
+  const focusIds=[...document.querySelectorAll('[data-group="sesfocus"].on')].map(c=>c.dataset.val);
+  const focusNames=focusIds.map(id=>(state.focuses.find(f=>f.id===id)||{}).name).filter(Boolean);
+  const rec={ id:uid("s"), kind, date:$("#s_date").value||todayISO(), duration:num($("#s_dur").value), focusIds, focusNames, worked:$("#s_worked").value.trim() };
+  if(kind==="coaching") rec.coach=($("#s_coach")?$("#s_coach").value.trim():"");
+  state[kind].push(rec); save(); tab="log"; render(); toast((kind==="coaching"?"Coaching":"Solo")+" saved");
+}
+function viewHistory(){
+  const all=[...state.matches,...state.coaching,...state.solo].sort((a,b)=> (b.date+b.id).localeCompare(a.date+a.id));
+  if(!all.length) return `<p class="eyebrow">History</p><h2 class="screen">Your log</h2><div class="empty"><div class="big">\u{1F3F8}</div>Nothing logged yet.<br>Head to the Log tab and record your first match.</div>`;
+  return `<p class="eyebrow">History</p><h2 class="screen">Your log</h2><p class="sub">${all.length} entr${all.length===1?"y":"ies"}. Tap any to see the detail.</p>`+all.map(entryHtml).join("");
+}
+function entryHtml(e){
+  let head, meta, tags="";
+  if(e.kind==="match"){
+    head=`vs ${esc(e.opponent||"Unknown")} &nbsp;<span style="color:${e.result==="Win"?"var(--good)":"var(--red)"}">${e.gamesFor}\u2013${e.gamesAgainst} ${e.result==="Win"?"W":e.result==="Loss"?"L":"D"}</span>`;
+    meta=[e.type,e.box].filter(Boolean).join(" \u00b7 ");
+    tags=(e.oppStyles||[]).map(s=>`<span class="minichip">${esc(s)}</span>`).join("");
+  } else if(e.kind==="coaching"){ head=`Coaching${e.coach?" \u00b7 "+esc(e.coach):""}`; meta=(e.duration?e.duration+" min":""); tags=(e.focusNames||[]).map(s=>`<span class="minichip">${esc(s)}</span>`).join(""); }
+  else { head="Solo session"; meta=(e.duration?e.duration+" min":""); tags=(e.focusNames||[]).map(s=>`<span class="minichip">${esc(s)}</span>`).join(""); }
+  return `<div class="entry"><div class="entry-top"><span class="badge ${e.kind}">${e.kind}</span><span class="date">${fmtDate(e.date)}</span></div><h3>${head}</h3>${meta?`<div class="meta">${esc(meta)}</div>`:""}${tags?`<div class="tags">${tags}</div>`:""}<div class="expand" id="exp_${e.id}">${detailHtml(e)}</div><button class="del" data-action="toggle-exp" data-id="${e.id}">Details</button><button class="del" data-action="delete" data-id="${e.id}" data-kind="${e.kind}" style="float:right">Delete</button></div>`;
+}
+function detailHtml(e){
+  if(e.kind==="match"){
+    const gs=(e.games||[]).map(g=>`${g.you==null?"?":g.you}\u2013${g.them==null?"?":g.them}`).join(", ");
+    let r=Object.entries(e.ratings||{}).map(([k,v])=>`<span class="minichip">${esc(k)}: ${v}</span>`).join(" ");
+    let f=(e.focusResponses||[]).map(x=>`<div class="kv"><b>${esc(x.label||x.name)}:</b> ${x.value==null||x.value===""?"\u2014":esc(x.value)}</div>`).join("");
+    return `${gs?`<div class="kv"><b>Games:</b> ${gs}`+(e.pointsFor!=null?` &nbsp;(${e.pointsFor}\u2013${e.pointsAgainst} pts)`:"")+`</div>`:""}
+      ${e.myLevel||e.oppLevel?`<div class="kv"><b>Levels:</b> you ${e.myLevel==null?"?":e.myLevel} vs ${e.oppLevel==null?"?":e.oppLevel}</div>`:""}
+      ${e.bestShot?`<div class="kv"><b>Best shot:</b> ${esc(e.bestShot)}</div>`:""}
+      ${e.worstShot?`<div class="kv"><b>Worst shot:</b> ${esc(e.worstShot)}</div>`:""}
+      ${(e.focusesActive&&e.focusesActive.length)?`<div class="kv" style="margin-top:6px"><b>Working on:</b> ${e.focusesActive.map(esc).join(" \u00b7 ")}</div>`:""}
+      ${e.reflection?`<div class="kv"><b>Reflection:</b> ${esc(e.reflection)}</div>`:""}
+      ${f?`<div style="margin-top:6px">${f}</div>`:""}
+      ${r?`<div class="tags" style="margin-top:8px">${r}</div>`:""}
+      ${e.note?`<div class="kv" style="margin-top:8px"><b>Note:</b> ${esc(e.note)}</div>`:""}`;
+  }
+  return `${e.worked?`<div class="kv"><b>Worked on:</b> ${esc(e.worked)}</div>`:""}${e.note?`<div class="kv"><b>Note:</b> ${esc(e.note)}</div>`:""}${!e.worked&&!e.note?"No extra detail.":""}`;
+}
+function viewFocus(){
+  const items=state.focuses.map(f=>`<div class="listitem"><div class="tog ${f.active?"on":""}" data-action="toggle-focus" data-id="${f.id}"></div><div class="txt"><b>${esc(f.name)}</b><small>${f.active?"Active":"Off"}</small></div><button class="iconbtn danger" data-action="del-focus" data-id="${f.id}">\u2715</button></div>`).join("");
+  return `<p class="eyebrow">Focus areas</p><h2 class="screen">What you're working on</h2><p class="sub">Flag what you're building right now (three is a good ceiling). Active ones show as a reminder on the match form when you write your reflection, and can be tagged in coaching and solo sessions.</p>${items||`<div class="empty">No focuses yet.</div>`}
+  <div class="card" style="margin-top:6px"><p class="eyebrow" style="margin-bottom:12px">Add a focus</p>
+    <div class="grp" style="margin-bottom:12px"><label class="lbl">Name</label><input type="text" id="nf_name" placeholder="e.g. Volleying the loose ball"></div>
+    <button class="btn primary block" data-action="add-focus">Add focus</button></div>`;
+}
+function listEditor(titleKey, label){
+  const arr=state.settings[titleKey];
+  const rows=arr.map((v,i)=>`<div class="listitem"><div class="txt"><b>${esc(v)}</b></div><button class="iconbtn danger" data-action="del-setting" data-key="${titleKey}" data-i="${i}">\u2715</button></div>`).join("");
+  return `<p class="eyebrow" style="margin-top:22px">${esc(label)}</p>${rows||`<p class="sub">None yet.</p>`}<div class="addrow"><input type="text" id="add_${titleKey}" placeholder="Add\u2026"><button data-action="add-setting" data-key="${titleKey}">Add</button></div>`;
+}
+function viewSetup(){
+  return `<p class="eyebrow">Setup</p><h2 class="screen">Make it yours</h2>
+  <div class="setup-note">Everything here is editable, so the app grows with your game. Your data lives on this device only \u2014 use <b>Export</b> to hand it to Claude alongside your Strava data.</div>
+  <p class="eyebrow">Your data</p>
+  <button class="btn dark block" data-action="export" style="margin-bottom:10px">Export data (download .json)</button>
+  <div class="btnrow" style="margin-bottom:10px"><button class="btn ghost block" data-action="copy">Copy for Claude</button><button class="btn ghost block" data-action="import">Import a file</button></div>
+  <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
+  <button class="del" data-action="clear" style="margin-bottom:4px">Clear all data</button>
+  ${listEditor("ratingDimensions","Things you rate out of 10")}
+  ${listEditor("shotTypes","Shot types (best / worst shot)")}
+  ${listEditor("opponentStyles","Opponent styles")}
+  ${listEditor("matchTypes","Match types")}`;
+}
+function exportData(){
+  const payload={ _readme:"Squash Log export. Dates are ISO (YYYY-MM-DD) so they line up with Strava. Feed this to Claude alongside Strava data.", exportedAt:new Date().toISOString(), ...state };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="squash-log-"+todayISO()+".json"; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); toast("Exported");
+}
+async function copyData(){
+  const txt=JSON.stringify({exportedAt:new Date().toISOString(),...state},null,2);
+  try{ await navigator.clipboard.writeText(txt); toast("Copied \u2014 paste into Claude"); }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");toast("Copied \u2014 paste into Claude");}catch(_){toast("Couldn't copy \u2014 use Export");} ta.remove(); }
+}
+function importData(file){
+  const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d.matches&&!d.focuses) throw 0;
+      if(!confirm("Import will replace everything currently in the app. Continue?")) return;
+      state={ settings:d.settings||clone(DEFAULTS.settings), focuses:d.focuses||[], opponents:d.opponents||[], matches:d.matches||[], coaching:d.coaching||[], solo:d.solo||[] };
+      for(const k in DEFAULTS.settings){ if(!state.settings[k]) state.settings[k]=clone(DEFAULTS.settings[k]); }
+      save(); render(); toast("Imported");
+    }catch(e){ alert("That doesn't look like a Squash Log file."); } };
+  r.readAsText(file);
+}
+document.addEventListener("click", e=>{
+  const t=e.target.closest("[data-action],[data-tab],[data-chip],[data-cell],[data-key],[data-bestof],[data-rate]");
+  if(!t) return;
+  if(t.dataset.tab){ stopMic(); tab=t.dataset.tab; render(); return; }
+  if(t.hasAttribute("data-chip")){ if(t.dataset.group==="oppstyle"||t.dataset.group==="sesfocus") t.classList.toggle("on"); return; }
+  if(t.hasAttribute("data-rate")){ const key=t.dataset.rate, v=+t.dataset.v; const row=t.closest("[data-raterow]"); if(row) row.querySelectorAll(".rcirc").forEach(c=>c.classList.remove("on")); t.classList.add("on"); mrate[key]=v; return; }
+  if(t.hasAttribute("data-cell")){ activeCell={g:+t.dataset.g,side:t.dataset.side}; renderGamesArea(); return; }
+  if(t.hasAttribute("data-key")){ const k=t.dataset.key; if(k==="clear"){ mgames[activeCell.g][activeCell.side]=null; } else { mgames[activeCell.g][activeCell.side]=+k; advanceCell(); } renderGamesArea(); return; }
+  if(t.hasAttribute("data-bestof")){ setBestOf(+t.dataset.bestof); return; }
+  const a=t.dataset.action;
+  switch(a){
+    case "new-match": bestOf=5; mgames=Array.from({length:5},()=>({you:null,them:null})); activeCell={g:0,side:"you"}; mrate={}; $("#view").innerHTML=viewMatchForm(); window.scrollTo(0,0); renderGamesArea(); break;
+    case "new-coaching": $("#view").innerHTML=viewSessionForm("coaching"); window.scrollTo(0,0); break;
+    case "new-solo": $("#view").innerHTML=viewSessionForm("solo"); window.scrollTo(0,0); break;
+    case "mic": toggleMic(t, t.dataset.target); break;
+    case "cancel": stopMic(); tab="log"; render(); break;
+    case "save-match": saveMatch(); break;
+    case "save-session": saveSession(t.dataset.kind); break;
+    case "toggle-exp": { const x=$("#exp_"+t.dataset.id); if(x) x.classList.toggle("open"); break; }
+    case "delete": if(confirm("Delete this entry?")){ const k=t.dataset.kind; state[k]=state[k].filter(r=>r.id!==t.dataset.id); save(); render(); toast("Deleted"); } break;
+    case "toggle-focus": { const f=state.focuses.find(x=>x.id===t.dataset.id); if(f){ f.active=!f.active; save(); render(); } break; }
+    case "del-focus": if(confirm("Remove this focus?")){ state.focuses=state.focuses.filter(x=>x.id!==t.dataset.id); save(); render(); } break;
+    case "add-focus": { const name=$("#nf_name").value.trim(); if(!name){ toast("Give it a name"); break; } state.focuses.push({id:uid("f"),name,active:true}); save(); render(); toast("Focus added"); break; }
+    case "add-setting": { const key=t.dataset.key, inp=$("#add_"+key), val=inp.value.trim(); if(val){ state.settings[key].push(val); save(); render(); } break; }
+    case "del-setting": state.settings[t.dataset.key].splice(+t.dataset.i,1); save(); render(); break;
+    case "export": exportData(); break;
+    case "copy": copyData(); break;
+    case "import": $("#fileInput").click(); break;
+    case "clear": if(confirm("Delete ALL data on this device? This can't be undone.")){ state=clone(DEFAULTS); save(); render(); toast("Cleared"); } break;
+  }
+});
+document.addEventListener("change", e=>{ if(e.target.id==="fileInput"&&e.target.files[0]) importData(e.target.files[0]); });
+load(); render();
+</script>
+</body>
+</html>
